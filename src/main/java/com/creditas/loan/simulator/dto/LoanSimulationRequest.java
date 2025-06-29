@@ -3,7 +3,6 @@ package com.creditas.loan.simulator.dto;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -21,7 +20,6 @@ import java.time.LocalDate;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class LoanSimulationRequest {
 
-    @Null
     private String clientId;
 
     @NotNull(message = "Loan amount must not be null")
