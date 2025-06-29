@@ -25,6 +25,7 @@ public class LoanSimulationRequest {
     private String clientId;
 
     @NotNull(message = "Loan amount must not be null")
+    @Positive(message = "Loan amount must be positive")
     private BigDecimal loanAmount;
 
     @Past(message = "Client birth date must be in the past")
