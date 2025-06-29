@@ -1,4 +1,4 @@
-package com.creditas.loan.simulator.model;
+package com.creditas.loan.simulator.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
