@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @ToString
 @AllArgsConstructor
 public class Installment {
+    private String number;
     private LocalDate date;
     private Double value;
 }
