@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+    <!--Suppress MagicNumber for every file below a test folder-->
+    <suppress files=".*[\\/]src[\\/](test)([^\\/]*)?[\\/]" checks="MagicNumber"/>
+    <!--Suppress MultipleStringLiterals for every file below a test folder-->
+    <suppress files=".*[\\/]src[\\/](test)([^\\/]*)?[\\/]" checks="MultipleStringLiterals"/>
+    <!--Suppress MissingJavadocMethod for every file below a test folder-->
+    <suppress files=".*[\\/]src[\\/](test)([^\\/]*)?[\\/]" checks="MissingJavadocMethod"/>
+    <!--Suppress MissingJavadocType for every file below a test folder-->
+    <suppress files=".*[\\/]src[\\/](test)([^\\/]*)?[\\/]" checks="MissingJavadocType"/>
+    <!--Suppress UncommentedMain for Application classes used in SpringBoot-->
+    <suppress files=".+Application\.java" checks="UncommentedMain" />
+
+    <!--Suppress MissingJavadocType for DTOs/Entities -->
+    <suppress checks="JavadocType" files=".*dto/.*\.java"/>
+    <suppress checks="JavadocType" files=".*entity/.*\.java"/>
+    <suppress checks="JavadocType" files=".*domain/.*\.java"/>
+
+    <!-- Suppress specific checks for generated files -->
+    <suppress checks=".*" files=".*generated.*"/>
+    <suppress files="[\\/]target[\\/]" checks="."/>
+    <suppress files="[\\/]gradle[\\/]" checks="."/>
+    <suppress files="[\\/].gradle[\\/]" checks="."/>
+    <suppress files="[\\/]build[\\/]" checks="."/>
+
+    <!-- Suppress long lines exceeding 120 characters -->
+    <suppress checks="LineLength" files=".*Configuration\.java"/>
+</suppressions>
