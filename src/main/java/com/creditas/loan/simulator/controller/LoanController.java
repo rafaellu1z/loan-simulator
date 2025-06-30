@@ -3,6 +3,11 @@ package com.creditas.loan.simulator.controller;
 import com.creditas.loan.simulator.dto.LoanSimulationRequest;
 import com.creditas.loan.simulator.dto.LoanSimulationResponse;
 import com.creditas.loan.simulator.service.LoanService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +24,12 @@ public class LoanController {
     private final LoanService loanService;
 
     @PostMapping("/simulate")
+    @Operation(summary = "Simulate a loan", description = "This endpoint simulates a loan based on the provided request parameters.")
+    @ApiResponses(value = {
+                    @ApiResponse(responseCode = "200", description = "Loan simulation successful", content = @Content (mediaType = "application/json", schema = @Schema(implementation = LoanSimulationResponse.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid request parameters", content = @Content (mediaType = "application/json")),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content (mediaType = "application/json"))
+    })
     public ResponseEntity<LoanSimulationResponse> simulateLoan(@Valid @RequestBody LoanSimulationRequest request) {
         LoanSimulationResponse response = loanService.calculateLoanSimulation(request);
         return ResponseEntity.ok(response.withRoundedValues());
