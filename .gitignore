@@ -25,3 +25,7 @@ replay_pid*
 
 # idea project files
 .idea/
+
+# Maven
+target/
+target/**

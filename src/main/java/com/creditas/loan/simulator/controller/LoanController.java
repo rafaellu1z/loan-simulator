@@ -21,6 +21,6 @@ public class LoanController {
     @PostMapping("/simulate")
     public ResponseEntity<LoanSimulationResponse> simulateLoan(@Valid @RequestBody LoanSimulationRequest request) {
         LoanSimulationResponse response = loanService.calculateLoanSimulation(request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(response.withRoundedValues());
     }
 }

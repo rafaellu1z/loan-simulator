@@ -4,6 +4,7 @@ import com.creditas.loan.simulator.dto.LoanSimulationRequest;
 import com.creditas.loan.simulator.dto.LoanSimulationResponse;
 import com.creditas.loan.simulator.service.LoanService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -21,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(LoanController.class)
+@DisplayName("LoanController Tests")
 public class LoanControllerTest {
 
     @Autowired
@@ -67,5 +69,21 @@ public class LoanControllerTest {
                 .andExpect(jsonPath("$.total_amount_payable").value(10500.00))
                 .andExpect(jsonPath("$.monthly_installment").value(875.00))
                 .andExpect(jsonPath("$.total_interest_paid").value(500.00));
+    }
+
+    @Test
+    public void shouldReturnBadRequest_invalidRequest() throws Exception {
+
+        LoanSimulationRequest request = new LoanSimulationRequest(
+                "123e4567-e89b-12d3-a456-426614174000",
+                new BigDecimal("10000.00"),
+                LocalDate.of(1990, 12, 12),
+                -1 // Invalid loan term
+        );
+
+        mockMvc.perform(post("/v1/loans/simulate")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
     }
 }
