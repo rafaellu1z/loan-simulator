@@ -1,7 +1,14 @@
 package com.creditas.loan.simulator.service;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 import com.creditas.loan.simulator.dto.LoanSimulationRequest;
 import com.creditas.loan.simulator.dto.LoanSimulationResponse;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,109 +17,108 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDate;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("LoanService Tests")
-public class LoanServiceTest {
+public final class LoanServiceTest {
 
-    @Mock
-    private InterestRateCalculator interestRateCalculator;
+  private static final int LOAN_TERM_IN_MONTHS = 12;
+  private static final int SCALE = 10;
 
-    @InjectMocks
-    private LoanService loanService;
+  @Mock
+  private InterestRateCalculator interestRateCalculator;
 
-    private LoanSimulationRequest request;
+  @InjectMocks
+  private LoanService loanService;
 
-    @BeforeEach
-    public void setUp() {
-        request = new LoanSimulationRequest(
-            "123e4567-e89b-12d3-a456-426614175000",
-            new BigDecimal("20000.00"),
-            LocalDate.of(1990, 9, 29), // 33 years old
-            12
-        );
-    }
+  private LoanSimulationRequest request;
 
-    @Test
-    @DisplayName("Should calculate loan simulation correctly for 12-month loan")
-    public void shouldCalculateLoanSimulationCorrectlyFor12MonthLoan() {
+  @BeforeEach
+  public void setUp() {
+    request = new LoanSimulationRequest(
+        "123e4567-e89b-12d3-a456-426614175000",
+        new BigDecimal("20000.00"),
+        LocalDate.of(1990, 9, 29), // 33 years old
+        LOAN_TERM_IN_MONTHS
+    );
+  }
 
-        BigDecimal expectedAnnualInterestRate = new BigDecimal("3.00");
+  @Test
+  @DisplayName("Should calculate loan simulation correctly for 12-month loan")
+  public void shouldCalculateLoanSimulationCorrectlyFor12MonthLoan() {
 
-        when(interestRateCalculator.calculateInterestRate(any())).thenReturn(expectedAnnualInterestRate);
+    BigDecimal expectedAnnualInterestRate = new BigDecimal("3.00");
 
-        LoanSimulationResponse response = loanService.calculateLoanSimulation(request);
+    when(interestRateCalculator.calculateInterestRate(any())).thenReturn(
+        expectedAnnualInterestRate);
 
-        assertThat(response).isNotNull();
-        assertThat(response.getId()).isNotNull();
-        assertThat(response.getClientId()).isEqualTo("123e4567-e89b-12d3-a456-426614175000");
-        assertThat(response.getLoanAmount()).isEqualTo(new BigDecimal("20000.00"));
-        assertThat(response.getInterestRate()).isEqualByComparingTo(new BigDecimal("3.00"));
-        assertThat(response.getLoanTermInMonths()).isEqualTo(12);
+    LoanSimulationResponse response = loanService.calculateLoanSimulation(request);
 
-        // Expected values based on the formula PMT = PV * [i(1+i)^n] / [(1+i)^n - 1]
-        // Monthly interest rate = 3% / 100 / 12 = 0.0025
-        // Monthly payment calculation:
-        // PMT = 20000 * [0.0025(1+0.0025)^12] / [(1+0.0025)^12 - 1] = 1693.8739751698
-        BigDecimal expectedMonthlyPayment = new BigDecimal("1693.8739751698");
+    assertThat(response).isNotNull();
+    assertThat(response.getId()).isNotNull();
+    assertThat(response.getClientId()).isEqualTo("123e4567-e89b-12d3-a456-426614175000");
+    assertThat(response.getLoanAmount()).isEqualTo(new BigDecimal("20000.00"));
+    assertThat(response.getInterestRate()).isEqualByComparingTo(new BigDecimal("3.00"));
+    assertThat(response.getLoanTermInMonths()).isEqualTo(LOAN_TERM_IN_MONTHS);
 
-        // Total payment = Monthly payment * 12
-        BigDecimal expectedTotalPayment = expectedMonthlyPayment.multiply(BigDecimal.valueOf(12));
+    // Expected values based on the formula PMT = PV * [i(1+i)^n] / [(1+i)^n - 1]
+    // Monthly interest rate = 3% / 100 / 12 = 0.0025
+    // Monthly payment calculation:
+    // PMT = 20000 * [0.0025(1+0.0025)^12] / [(1+0.0025)^12 - 1] = 1693.8739751698
+    BigDecimal expectedMonthlyPayment = new BigDecimal("1693.8739751698");
 
-        // Total interest = Total payment - Loan amount
-        BigDecimal expectedTotalInterest = expectedTotalPayment.subtract(request.getLoanAmount());
+    // Total payment = Monthly payment * 12
+    BigDecimal expectedTotalPayment = expectedMonthlyPayment.multiply(BigDecimal.valueOf(LOAN_TERM_IN_MONTHS));
 
-        assertThat(response.getMonthlyInstallment()).isEqualByComparingTo(expectedMonthlyPayment);
-        assertThat(response.getTotalAmountPayable()).isEqualByComparingTo(expectedTotalPayment);
-        assertThat(response.getTotalInterestPaid()).isEqualByComparingTo(expectedTotalInterest);
-    }
+    // Total interest = Total payment - Loan amount
+    BigDecimal expectedTotalInterest = expectedTotalPayment.subtract(request.getLoanAmount());
 
-    @Test
-    @DisplayName("Should maintain precision in financial calculations")
-    void shouldMaintainPrecisionInFinancialCalculations() {
+    assertThat(response.getMonthlyInstallment()).isEqualByComparingTo(expectedMonthlyPayment);
+    assertThat(response.getTotalAmountPayable()).isEqualByComparingTo(expectedTotalPayment);
+    assertThat(response.getTotalInterestPaid()).isEqualByComparingTo(expectedTotalInterest);
+  }
 
-        BigDecimal expectedRate = new BigDecimal("3.00");
-        when(interestRateCalculator.calculateInterestRate(any())).thenReturn(expectedRate);
+  @Test
+  @DisplayName("Should maintain precision in financial calculations")
+  void shouldMaintainPrecisionInFinancialCalculations() {
 
-        LoanSimulationResponse response = loanService.calculateLoanSimulation(request);
+    BigDecimal expectedRate = new BigDecimal("3.00");
+    when(interestRateCalculator.calculateInterestRate(any())).thenReturn(expectedRate);
 
-        BigDecimal totalCalculated = response.getMonthlyInstallment()
-                .multiply(BigDecimal.valueOf(request.getLoanTermInMonths()));
+    LoanSimulationResponse response = loanService.calculateLoanSimulation(request);
 
-        BigDecimal difference = response.getTotalAmountPayable()
-                .subtract(totalCalculated).abs();
+    BigDecimal totalCalculated = response.getMonthlyInstallment()
+        .multiply(BigDecimal.valueOf(request.getLoanTermInMonths()));
 
-        assertThat(difference).isLessThanOrEqualTo(new BigDecimal("0.01"));
+    BigDecimal difference = response.getTotalAmountPayable()
+        .subtract(totalCalculated).abs();
 
-        BigDecimal interestCalculated = response.getTotalAmountPayable()
-                .subtract(response.getLoanAmount());
+    assertThat(difference).isLessThanOrEqualTo(new BigDecimal("0.01"));
 
-        assertThat(response.getTotalInterestPaid())
-                .isEqualByComparingTo(interestCalculated);
-    }
+    BigDecimal interestCalculated = response.getTotalAmountPayable()
+        .subtract(response.getLoanAmount());
 
-    @Test
-    @DisplayName("Should handle zero interest rate correctly")
-    void shouldHandleZeroInterestRateCorrectly() {
+    assertThat(response.getTotalInterestPaid())
+        .isEqualByComparingTo(interestCalculated);
+  }
 
-        BigDecimal zeroRate = BigDecimal.ZERO;
-        when(interestRateCalculator.calculateInterestRate(request)).thenReturn(zeroRate);
+  @Test
+  @DisplayName("Should handle zero interest rate correctly")
+  void shouldHandleZeroInterestRateCorrectly() {
 
-        LoanSimulationResponse response = loanService.calculateLoanSimulation(request);
+    BigDecimal zeroRate = BigDecimal.ZERO;
+    when(interestRateCalculator.calculateInterestRate(request)).thenReturn(zeroRate);
 
-        assertThat(response.getTotalInterestPaid()).isEqualByComparingTo(BigDecimal.ZERO);
+    LoanSimulationResponse response = loanService.calculateLoanSimulation(request);
 
-        assertThat(response.getTotalAmountPayable().setScale(2, RoundingMode.HALF_UP)).isEqualByComparingTo(request.getLoanAmount());
+    assertThat(response.getTotalInterestPaid()).isEqualByComparingTo(BigDecimal.ZERO);
 
-        BigDecimal expectedMonthlyPayment = request.getLoanAmount().divide(BigDecimal.valueOf(12), 10, RoundingMode.HALF_UP);
+    assertThat(
+        response.getTotalAmountPayable().setScale(2, RoundingMode.HALF_UP)).isEqualByComparingTo(
+        request.getLoanAmount());
 
-        assertThat(response.getMonthlyInstallment()).isEqualByComparingTo(expectedMonthlyPayment);
-    }
+    BigDecimal expectedMonthlyPayment =
+        request.getLoanAmount().divide(BigDecimal.valueOf(LOAN_TERM_IN_MONTHS), SCALE, RoundingMode.HALF_UP);
+
+    assertThat(response.getMonthlyInstallment()).isEqualByComparingTo(expectedMonthlyPayment);
+  }
 }

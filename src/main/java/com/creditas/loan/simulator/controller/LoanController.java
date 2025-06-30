@@ -21,17 +21,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class LoanController {
 
-    private final LoanService loanService;
+  private final LoanService loanService;
 
-    @PostMapping("/simulate")
-    @Operation(summary = "Simulate a loan", description = "This endpoint simulates a loan based on the provided request parameters.")
-    @ApiResponses(value = {
-                    @ApiResponse(responseCode = "200", description = "Loan simulation successful", content = @Content (mediaType = "application/json", schema = @Schema(implementation = LoanSimulationResponse.class))),
-                    @ApiResponse(responseCode = "400", description = "Invalid request parameters", content = @Content (mediaType = "application/json")),
-                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content (mediaType = "application/json"))
-    })
-    public ResponseEntity<LoanSimulationResponse> simulateLoan(@Valid @RequestBody LoanSimulationRequest request) {
-        LoanSimulationResponse response = loanService.calculateLoanSimulation(request);
-        return ResponseEntity.ok(response.withRoundedValues());
-    }
+  /**
+   * Simulates a loan based on the provided request parameters.
+   *
+   * @param request the loan simulation request containing the necessary parameters
+   * @return a response entity containing the loan simulation response with rounded values
+   */
+  @PostMapping("/simulate")
+  @Operation(summary = "Simulate a loan", description = "This endpoint simulates a loan based on the provided request parameters.")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Loan simulation successful", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoanSimulationResponse.class))),
+      @ApiResponse(responseCode = "400", description = "Invalid request parameters", content = @Content(mediaType = "application/json")),
+      @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json"))
+  })
+  public ResponseEntity<LoanSimulationResponse> simulateLoan(
+      @Valid @RequestBody final LoanSimulationRequest request) {
+    LoanSimulationResponse response = loanService.calculateLoanSimulation(request);
+    return ResponseEntity.ok(response.withRoundedValues());
+  }
 }

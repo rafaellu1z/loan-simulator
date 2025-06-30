@@ -4,10 +4,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class LoanSimulatorApplication {
+public final class LoanSimulatorApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(LoanSimulatorApplication.class, args);
-	}
+  private LoanSimulatorApplication() {
+    // Prevent instantiation
+  }
+
+  public static void main(final String[] args) {
+    SpringApplication.run(LoanSimulatorApplication.class, args);
+  }
 
 }
