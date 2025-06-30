@@ -1,0 +1,21 @@
+# Ignore build artifacts and temporary files
+target/classes/
+target/test-classes/
+target/generated-sources/
+target/maven-status/
+target/maven-archiver/
+target/surefire-reports/
+target/*.original
+
+# Not ignore the JAR files in the target directory
+!target/*.jar
+
+# Other common files to ignore
+.git/
+.gitignore
+README.md
+Dockerfile
+docker-compose.yml
+*.md
+node_modules/
+.DS_Store
