@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Getter
 @Setter
@@ -25,4 +26,13 @@ public class LoanSimulationResponse {
     private BigDecimal totalAmountPayable;
     private BigDecimal monthlyInstallment;
     private BigDecimal totalInterestPaid;
+
+    public LoanSimulationResponse withRoundedValues() {
+        this.loanAmount = this.loanAmount.setScale(2, RoundingMode.HALF_UP);
+        this.interestRate = this.interestRate.setScale(2, RoundingMode.HALF_UP);
+        this.totalAmountPayable = this.totalAmountPayable.setScale(2, RoundingMode.HALF_UP);
+        this.monthlyInstallment = this.monthlyInstallment.setScale(2, RoundingMode.HALF_UP);
+        this.totalInterestPaid = this.totalInterestPaid.setScale(2, RoundingMode.HALF_UP);
+        return this;
+    }
 }

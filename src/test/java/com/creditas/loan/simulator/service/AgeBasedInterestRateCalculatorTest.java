@@ -1,6 +1,7 @@
 package com.creditas.loan.simulator.service;
 
 import com.creditas.loan.simulator.dto.LoanSimulationRequest;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -9,6 +10,7 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@DisplayName("AgeBasedInterestRateCalculator Tests")
 public class AgeBasedInterestRateCalculatorTest {
 
     @ParameterizedTest

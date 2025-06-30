@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -22,6 +23,13 @@ public class LoanService {
 
         BigDecimal totalPayment = monthlyPayment.multiply(BigDecimal.valueOf(request.getLoanTermInMonths()));
 
+        BigDecimal interestPaid;
+        if (annualInterestRate.compareTo(BigDecimal.ZERO) == 0) {
+            interestPaid = BigDecimal.ZERO;
+        } else {
+            interestPaid = totalPayment.subtract(request.getLoanAmount());
+        }
+
         return new LoanSimulationResponse(
                 UUID.randomUUID().toString(),
                 request.getClientId(),
@@ -30,11 +38,14 @@ public class LoanService {
                 request.getLoanTermInMonths(),
                 totalPayment,
                 monthlyPayment,
-                totalPayment.subtract(request.getLoanAmount())
+                interestPaid
         );
     }
 
     private static BigDecimal calculateMonthlyRate(BigDecimal amount, int loanTermInMonths, BigDecimal annualInterestRate) {
+        if (Objects.equals(annualInterestRate, BigDecimal.ZERO)) {
+            return amount.divide(BigDecimal.valueOf(loanTermInMonths), 10, RoundingMode.HALF_UP);
+        }
         BigDecimal monthlyInterestRate = annualInterestRate
                 .divide(new BigDecimal("100"), 10, RoundingMode.HALF_UP)
                 .divide(new BigDecimal("12"), 10, RoundingMode.HALF_UP);
