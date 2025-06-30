@@ -3,6 +3,8 @@ package com.creditas.loan.simulator.dto;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Positive;
@@ -27,6 +29,8 @@ public class LoanSimulationRequest {
   @Schema(description = "Requested loan amount", example = "10000.22", format = "decimal")
   @NotNull(message = "Loan amount must not be null")
   @Positive(message = "Loan amount must be positive")
+  @DecimalMin(value = "1.00", message = "Loan amount must be at least 1.00")
+  @DecimalMax(value = "1000000.00", message = "Loan amount must not exceed 1,000,000.00")
   private BigDecimal loanAmount;
 
   @Schema(description = "Birth date of the client - ISO 8601 format", example = "1990-01-01")
